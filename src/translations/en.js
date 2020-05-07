@@ -1108,6 +1108,13 @@ module.exports = {
 		"yourCalendars_label": "Your calendars",
 		"yourFolders_action": "YOUR FOLDERS",
 		"yourMessage_label": "Your message",
-		"createUserFailed_msg": "Could not create the user. Please contact support."
+		"createUserFailed_msg": "Could not create the user. Please contact support.",
+		"rejectedSenders_label": "Rejected senders",
+		"rejectedSenderListInfo_msg": "List of delivery attempts to your mailbox which have been rejected by our sender restrictions. To whitelist an email sender you can add a spam rule for the sender mail address or domain.",
+		"mailServer_label": "Mail server",
+		"rejectReason_label": "Reject reason",
+		"emailRecipient_label": "Email recipient",
+		"showRejectReason_action": "Show reject reason"
+
 	}
 }
