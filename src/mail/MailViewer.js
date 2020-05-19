@@ -764,8 +764,7 @@ export class MailViewer {
 						{
 							label: "download_action",
 							click: () => {
-								fileController.downloadAndOpen(file, true)
-								              .catch(FileOpenError, () => Dialog.error("canNotOpenFileOnDevice_msg"))
+								this._downloadAndOpenAttachment(file, true)
 							},
 							type: ButtonType.Dropdown
 						}
@@ -1383,6 +1382,16 @@ export class MailViewer {
 		}
 	}
 
+	_downloadAndOpenAttachment(file: TutanotaFile, open: boolean): void {
+		fileController.downloadAndOpen(file, open)
+		              .catch(FileOpenError, () => Dialog.error("canNotOpenFileOnDevice_msg"))
+		              .catch(e => {
+			              const msg = e || "unknown error"
+			              console.logError("could not open file:", msg)
+			              return Dialog.error("errorDuringFileOpen_msg")
+		              })
+	}
+
 	_createAttachmentsButtons(files: $ReadOnlyArray<TutanotaFile>, inlineCids: $ReadOnlyArray<Id>): Button[] {
 		// Only show file buttons which do not correspond to inline images in HTML
 		files = files.filter((item) => inlineCids.includes(item.cid) === false)
@@ -1393,14 +1402,10 @@ export class MailViewer {
 				const dropdownButton: Button = createDropDownButton(() => file.name,
 					() => Icons.Attachment,
 					() => [
-						new Button("open_action",
-							() => fileController.downloadAndOpen(file, true)
-							                    .catch(FileOpenError, () => Dialog.error("canNotOpenFileOnDevice_msg")),
-							null).setType(ButtonType.Dropdown),
-						new Button("download_action",
-							() => fileController.downloadAndOpen(file, false)
-							                    .catch(FileOpenError, () => Dialog.error("canNotOpenFileOnDevice_msg")),
-							null).setType(ButtonType.Dropdown)
+						new Button("open_action", () => this._downloadAndOpenAttachment(file, true), null)
+							.setType(ButtonType.Dropdown),
+						new Button("download_action", () => this._downloadAndOpenAttachment(file, false), null)
+							.setType(ButtonType.Dropdown)
 					], 200, () => {
 						// Bubble buttons use border so dropdown is misaligned by default
 						const rect = dropdownButton._domButton.getBoundingClientRect()
@@ -1414,7 +1419,7 @@ export class MailViewer {
 			})
 		} else {
 			buttons = files.map(file => new Button(() => file.name,
-				() => fileController.downloadAndOpen(file, true).catch(FileOpenError, () => Dialog.error("canNotOpenFileOnDevice_msg")),
+				() => this._downloadAndOpenAttachment(file, true),
 				() => Icons.Attachment)
 				.setType(ButtonType.Bubble)
 				.setStaticRightText("(" + formatStorageSize(Number(file.size)) + ")")
